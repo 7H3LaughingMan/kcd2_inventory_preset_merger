@@ -29,7 +29,7 @@ jobs:
       - name: Edit Mod Manifest (Version)
         uses: Mudlet/xmlstarlet-action@v1.2
         with:
-          args: ed -L --update "/kcd_mod/info/version" -v "${{ steps.get_version.outputs.version-without-v }}" "mod.manifest"
+          args: ed -L --update "/kcd_mod/info/version" -v "${{ steps.get_version.outputs.version-without-v }}" "kcd2_inventory_preset_merger/mod.manifest"
 
       - name: Get Date
         id: date
@@ -38,7 +38,19 @@ jobs:
       - name: Edit Mod Manifest (Creation Date)
         uses: Mudlet/xmlstarlet-action@v1.2
         with:
-          args: ed -L --update "/kcd_mod/info/created_on" -v "${{ steps.date.outputs.date }}" "mod.manifest"
+          args: ed -L --update "/kcd_mod/info/created_on" -v "${{ steps.date.outputs.date }}" "kcd2_inventory_preset_merger/mod.manifest"
+      
+      - name: Copy Executable
+        run: cp -a bin/Release/net8.0/win-x64/publish/. kcd2_inventory_preset_merger/
+      
+      - name: Package Module
+        run: zip -r kcd2_inventory_preset_merger.zip kcd2_inventory_preset_merger/
+
+      - uses: release-flow/keep-a-changelog-action@v3
+        id: changelog
+        with:
+          command: query
+          version: ${{ steps.get_version.outputs.version-without-v }}
 
       - name: Update Release With Files
         id: create_version_release
@@ -49,4 +61,5 @@ jobs:
           draft: ${{ github.event.release.draft }}
           prerelease: ${{ github.event.release.prerelease }}
           name: ${{ steps.get_version.outputs.version-without-v }}
-          artifacts: "./mod.manifest"
+          body: ${{ steps.changelog.outputs.release-notes }}
+          artifacts: "./kcd2_inventory_preset_merger.zip"
