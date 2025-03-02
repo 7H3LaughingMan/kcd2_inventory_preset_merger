@@ -1,0 +1,52 @@
+name: Create Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: build
+        run: dotnet publish
+
+      - name: Extract Version
+        id: get_version
+        uses: battila7/get-version-action@v2
+
+      - name: Edit Mod Manifest (Version)
+        uses: Mudlet/xmlstarlet-action@v1
+        with:
+          args: ed -L --update "/kcd_mod/info/version" -v "${{ steps.get_version.outputs.version-without-v }}" "mod.manifest"
+
+      - name: Get Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%m-%d-%Y')"
+
+      - name: Edit Mod Manifest (Creation Date)
+        uses: Mudlet/xmlstarlet-action@v1
+        with:
+          args: ed -L --update "/kcd_mod/info/created_on" -v "${{ steps.date.outputs.date }}" "mod.manifest"
+
+      - name: Update Release With Files
+        id: create_version_release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          draft: ${{ github.event.release.draft }}
+          prerelease: ${{ github.event.release.prerelease }}
+          name: ${{ steps.get_version.outputs.version-without-v }}
+          artifacts: "./mod.manifest"
