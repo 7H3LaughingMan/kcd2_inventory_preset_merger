@@ -2,7 +2,7 @@
 <kcd_mod>
   <info>
     <name>KCD2 InventoryPreset Merger</name>
-    <modid>kcd2_inventory_preset_merger</modid>
+    <modid>kcd_two_inventory_preset_merger</modid>
     <description>Merges InventoryPresets</description>
     <author>7H3LaughingMan</author>
     <version></version>

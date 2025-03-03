@@ -30,7 +30,7 @@ class Program
 
         OutputMerge();
 
-        File.WriteAllLines(Path.Combine(gameDirectory, "Mods", "mod_order.txt"), [.. mods.Select(x => x.ModId), "kcd2_inventory_preset_merger"]);
+        File.WriteAllLines(Path.Combine(gameDirectory, "Mods", "mod_order.txt"), [.. mods.Select(x => x.ModId), "kcd_two_inventory_preset_merger"]);
         Console.WriteLine("Updated mod_order.txt");
         Console.Write("Press any key to continue . . . ");
         Console.ReadKey();
@@ -67,7 +67,7 @@ class Program
         foreach (var modFolder in Directory.GetDirectories(Path.Combine(gamePath, "Mods")))
         {
             var mod = KCD_Mod.Parse(Path.Combine(modFolder, "mod.manifest"));
-            if (!mod.ModId.Equals("kcd2_inventory_preset_merger"))
+            if (!mod.ModId.Equals("kcd_two_inventory_preset_merger"))
                 mods.Add(mod);
         }
 
@@ -135,7 +135,7 @@ class Program
         if (!Directory.Exists(Path.Combine(workingDirectory, "Data")))
             Directory.CreateDirectory(Path.Combine(workingDirectory, "Data"));
 
-        using var zipFile = File.Open(Path.Combine(workingDirectory, "Data", "kcd2_inventory_preset_merger.pak"), FileMode.Create);
+        using var zipFile = File.Open(Path.Combine(workingDirectory, "Data", "kcd_two_inventory_preset_merger.pak"), FileMode.Create);
         using var zipArchive = new ZipArchive(zipFile, ZipArchiveMode.Create);
         var serializer = new XmlSerializer(typeof(DatabaseType));
 
@@ -153,12 +153,12 @@ class Program
                     outputDatabase.InventoryPresets.InventoryPreset.Add(workingDatabase.InventoryPresets.InventoryPreset.First(x => string.Equals(inventoryPreset.Name, x.Name)));
                 }
 
-                var zipArchiveEntry = zipArchive.CreateEntry($"Libs/Tables/item/{item.Key.FileNameWithoutExtension}__kcd2_inventory_preset_merger.xml");
+                var zipArchiveEntry = zipArchive.CreateEntry($"Libs/Tables/item/{item.Key.FileNameWithoutExtension}__kcd_two_inventory_preset_merger.xml");
                 using var stream = zipArchiveEntry.Open();
                 serializer.Serialize(stream, outputDatabase);
             }
         }
 
-        Console.WriteLine("Created kcd2_inventory_preset_merger.pak");
+        Console.WriteLine("Created kcd_two_inventory_preset_merger.pak");
     }
 }
